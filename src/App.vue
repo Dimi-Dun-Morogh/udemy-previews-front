@@ -1,88 +1,57 @@
 <template>
   <div id="app">
-    <b-button title="info" class="btnInfo" v-b-modal.modal-1 variant="success">
-      <b-icon icon="info-circle"></b-icon>
-    </b-button>
-    <b-modal
-      id="modal-1"
-      body-bg-variant="light"
-      headerBgVariant="dark"
-      header-text-variant="light"
+    <b-overlay
+      :show="preloader"
+      variant="dark"
+      rounded="sm"
+      class="preloaderOverlay"
     >
-      <p class="my-4">
-        by default data is fetched for
-        <a href="#" @click="clickLink"
-          >https://www.udemy.com/course/flutter-dart-the-complete-flutter-app-development-course/</a
-        >;
-        <br />
-        copy pase any udemy course url to parse its avalaible preview video info
-        <br />
-        few url's for example (click on them) :
-        <a href="#" @click="clickLink"
-          >https://www.udemy.com/course/modern-javascript-from-beginning/</a
-        >
-        <br />
-        <a href="#" @click="clickLink"
-          >https://www.udemy.com/course/complete-react-developer-zero-to-mastery/</a
-        >
-      </p>
-    </b-modal>
-    <div class="input-wrap mb-2">
-      <b-input-group size="sm" class="mb-2">
-        <b-form-input
-          v-model="text"
-          placeholder="enter any udemy course url"
-          @keydown.enter="fetchData"
-        ></b-form-input>
-        <b-input-group-prepend is-text class="searchBtn" @click="fetchData">
-          <b-icon icon="search"></b-icon>
-        </b-input-group-prepend>
-      </b-input-group>
-    </div>
-    <div class="d-flex space-between">
-      <span
-        >previews for
-        <a :href="previews.url">{{ previews.courseName }}</a></span
+      <b-button
+        title="info"
+        class="btnInfo"
+        v-b-modal.modal-1
+        variant="success"
       >
-      <b-button-toolbar>
-        <b-button-group class="ml-auto mb-1">
-          <b-button
-            title="duration longer"
-            @click="durationDown"
-            :disabled="!this.disabled"
-          >
-            <b-icon icon="arrow-up-circle"></b-icon>
-          </b-button>
-          <b-button
-            title="duration shorter"
-            @click="durationUp"
-            variant="success"
-            :disabled="this.disabled"
-          >
-            <b-icon icon="arrow-down-circle"></b-icon>
-          </b-button>
-        </b-button-group>
-      </b-button-toolbar>
-    </div>
-    <ListContainer />
+        <b-icon icon="info-circle"></b-icon>
+      </b-button>
+      <Modal />
+      <InputForm />
+      <div class="d-flex justify-content-between align-items-center">
+        <span
+          >previews for
+          <a :href="previews.url">{{ previews.courseName }}</a></span
+        >
+        <SortButtons
+          :disabled="disabled"
+          @onButtonUp="durationUp"
+          @onButtonDown="durationDown"
+        />
+      </div>
+      <ListContainer />
+    </b-overlay>
   </div>
 </template>
 
 <script>
 import ListContainer from "./components/list-container";
+import Modal from "./components/Modal";
+import InputForm from "./components/InputForm";
+import SortButtons from "./components/SortButtons";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "App",
   data: () => ({
-    text: "",
     disabled: true
   }),
   components: {
-    ListContainer
+    ListContainer,
+    Modal,
+    InputForm,
+    SortButtons
   },
   computed: {
-    ...mapGetters(["previews"])
+    ...mapGetters(["previews", "preloader"])
   },
   methods: {
     ...mapActions(["sortByDurationDown", "sortByDurationUp", "getPreviews"]),
@@ -93,14 +62,6 @@ export default {
     durationDown() {
       this.disabled = !this.disabled;
       this.sortByDurationDown();
-    },
-    fetchData() {
-      this.getPreviews(this.text);
-    },
-    clickLink(e) {
-      console.log(e.target.text);
-      this.$bvModal.hide("modal-1");
-      this.getPreviews(e.target.text);
     }
   }
 };
@@ -121,7 +82,7 @@ export default {
   min-height: 300px;
   border-radius: 5px;
   margin-top: 30px;
-  padding-top: 20px;
+  /* padding-top: 20px; */
   position: relative;
 }
 body {
@@ -135,11 +96,7 @@ body {
     rgba(0, 212, 255, 1) 100%
   );
 }
-.input-wrap {
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-}
+
 .searchBtn {
   cursor: pointer;
 }
@@ -148,5 +105,8 @@ body {
   right: 0;
   margin-left: auto;
   top: 0;
+}
+.preloaderOverlay {
+  min-height: 300px;
 }
 </style>

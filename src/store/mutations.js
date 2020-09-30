@@ -1,3 +1,4 @@
 export default {
-  PREVIEWS: "PREVIEWS"
+  PREVIEWS: "PREVIEWS",
+  PRELOADER: "PRELOADER"
 };
